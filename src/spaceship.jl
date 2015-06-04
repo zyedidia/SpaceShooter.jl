@@ -83,7 +83,7 @@ end
 function update_pos(ship::SpaceShip, dt)
 	wrap_position(ship.sprite)
 
-	velocity = Vector2f(ship.speed * cosd(ship.angle - 90) * dt, ship.speed * sind(ship.angle - 90) * dt)
+	velocity = Vector2f(ship.speed * cosd(ship.angle - 90) * dt * X_SCALE, ship.speed * sind(ship.angle - 90) * dt * Y_SCALE)
 	set_rotation(ship.sprite, ship.angle)
 	move(ship.sprite, velocity)
 end

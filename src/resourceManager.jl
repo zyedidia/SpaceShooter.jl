@@ -20,7 +20,9 @@ function load_sound_effects(path = "sound")
 
 	soundfiles = readdir(GAME_PATH * "/assets/$path")
 	for file in soundfiles
-		sounds[filename(file)] = SoundBuffer(GAME_PATH * "/assets/$path/$file")
+		if ismatch(r".*\.(ogg|wav)", file)
+			sounds[filename(file)] = SoundBuffer(GAME_PATH * "/assets/$path/$file")
+		end
 	end
 	sounds
 end
@@ -37,14 +39,18 @@ function load_textures(path = "img")
 		if isdir(GAME_PATH * "/assets/$path/$file")
 			innerfiles = readdir(GAME_PATH * "/assets/$path/$file")
 			for innerfile in innerfiles
-				texture = Texture(GAME_PATH * "/assets/$path/$file/$innerfile")
-				textures[filename(innerfile)] = texture
-				set_smooth(texture, true)
+				if ismatch(r".*\.png", innerfile)
+					texture = Texture(GAME_PATH * "/assets/$path/$file/$innerfile")
+					textures[filename(innerfile)] = texture
+					set_smooth(texture, true)
+				end
 			end
 		else
-			texture = Texture(GAME_PATH * "/assets/$path/$file")
-			textures[filename(file)] = texture
-			set_smooth(texture, true)
+			if ismatch(r".*\.png", file)
+				texture = Texture(GAME_PATH * "/assets/$path/$file")
+				textures[filename(file)] = texture
+				set_smooth(texture, true)
+			end
 		end
 	end
 	textures

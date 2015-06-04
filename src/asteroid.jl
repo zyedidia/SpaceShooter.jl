@@ -23,7 +23,7 @@ end
 function update_pos(asteroid::Asteroid, dt)
 	wrap_position(asteroid.sprite)
 
-	velocity = Vector2f(asteroid.speed * cosd(asteroid.moveangle - 90) * dt, asteroid.speed * sind(asteroid.moveangle - 90) * dt)
+	velocity = Vector2f(asteroid.speed * cosd(asteroid.moveangle - 90) * dt * X_SCALE, asteroid.speed * sind(asteroid.moveangle - 90) * dt * Y_SCALE)
 	rotate(asteroid.sprite, asteroid.rotate_speed * dt)
 	move(asteroid.sprite, velocity)
 end

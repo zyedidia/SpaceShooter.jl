@@ -21,7 +21,7 @@ function update(laser::Laser, dt)
 end
 
 function update_pos(laser::Laser, dt)
-	velocity = Vector2f(laser.speed * cosd(laser.angle - 90) * dt, laser.speed * sind(laser.angle - 90) * dt)
+	velocity = Vector2f(laser.speed * cosd(laser.angle - 90) * dt * X_SCALE, laser.speed * sind(laser.angle - 90) * dt * Y_SCALE)
 	set_rotation(laser.sprite, laser.angle)
 	move(laser.sprite, velocity)
 end
