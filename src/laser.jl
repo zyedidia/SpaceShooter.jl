@@ -2,6 +2,7 @@ type Laser
 	sprite::Sprite
 	speed::Real
 	angle::Real
+	color::Color
 end
 
 function Laser(texture_name, pos)
@@ -12,7 +13,17 @@ function Laser(texture_name, pos)
 	set_position(sprite, pos)
 	scale(sprite, Vector2f(X_SCALE, Y_SCALE))
 
-	Laser(sprite, LASER_SPEED, 0)
+	color = SFML.black
+
+	if Base.contains(texture_name, "Blue")
+		color = SFML.blue
+	elseif Base.contains(texture_name, "Red")
+		color = SFML.red
+	elseif Base.contains(texture_name, "Green")
+		color = SFML.green
+	end
+
+	Laser(sprite, LASER_SPEED, 0, color)
 end
 
 function update(laser::Laser, dt)
@@ -21,6 +32,13 @@ function update(laser::Laser, dt)
 end
 
 function update_pos(laser::Laser, dt)
+	pos = get_position(laser.sprite)
+	size = get_size(get_texture(laser.sprite))
+	if  pos.x > SCREEN_WIDTH + size.x / 2 || pos.x < 0 - size.x / 2 ||
+	    pos.y > SCREEN_HEIGHT + size.y / 2 || pos.y < 0 - size.y / 2
+		die(laser)
+	end
+
 	velocity = Vector2f(laser.speed * cosd(laser.angle - 90) * dt * X_SCALE, laser.speed * sind(laser.angle - 90) * dt * Y_SCALE)
 	set_rotation(laser.sprite, laser.angle)
 	move(laser.sprite, velocity)
@@ -46,9 +64,9 @@ function draw(window, laser::Laser)
 
 	lightshader = manager.shaders["lightshader"]
 	set_parameter(lightshader, "frag_LightOrigin", get_position(laser.sprite))
-	set_parameter(lightshader, "frag_LightColor", Vector3f(0, 0, 255))
-	set_parameter(lightshader, "frag_LightAttenuation", 10)
+	set_parameter(lightshader, "frag_LightColor", Vector3f(laser.color.r, laser.color.g, laser.color.b))
+	set_parameter(lightshader, "frag_LightAttenuation", 25)
 	states = RenderStates(SFML.blend_add, lightshader)
 
-	draw(render_texture, render_texture_sprite, states)
+	draw(window, render_texture_sprite, states)
 end

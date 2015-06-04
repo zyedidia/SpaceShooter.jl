@@ -29,6 +29,7 @@ function update_pos(asteroid::Asteroid, dt)
 end
 
 function laser_collision(asteroid::Asteroid, laser::Laser)
+	add_explosion(get_position(laser.sprite))
 	die(asteroid)
 	die(laser)
 end

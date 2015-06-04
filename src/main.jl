@@ -4,6 +4,7 @@ abstract GameObject
 
 include("util.jl")
 include("resourceManager.jl")
+include("animation.jl")
 include("laser.jl")
 include("asteroid.jl")
 include("spaceship.jl")
@@ -28,14 +29,14 @@ const LASER_SPEED = 10
 
 const NUM_ASTEROIDS = 10
 
-# These need to be global so I can access them for drawing shaders in laser.jl
-const render_texture = RenderTexture(SCREEN_WIDTH, SCREEN_HEIGHT)
-const render_texture_sprite = Sprite()
-set_texture(render_texture_sprite, get_texture(render_texture))
-
 function spawn_asteroid()
 	asteroid = Asteroid("meteorBrown_big$(rand(1:4))", Vector2f(rand(0:SCREEN_WIDTH), rand(0:SCREEN_HEIGHT)))
 	push!(game_objects::Array{GameObject}, asteroid)
+end
+
+function add_explosion(pos)
+	explosion = Animation("expl_01_", pos, 0.05, 23)
+	push!(animations::Array{Animation}, explosion)
 end
 
 function main()
@@ -46,10 +47,16 @@ function main()
 	set_framerate_limit(window, 60)
 	event = Event()
 
+	render_texture = RenderTexture(SCREEN_WIDTH, SCREEN_HEIGHT)
+	# This needs to be global so I can access it for drawing shaders
+	global const render_texture_sprite = Sprite()
+	set_texture(render_texture_sprite, get_texture(render_texture))
+
 	player = PlayerShip("playerShip1_blue")
 
 	global game_objects = GameObject[]
 	global lasers = Laser[]
+	global animations = Animation[]
 	push!(game_objects, player)
 
 	for i = 1:NUM_ASTEROIDS
@@ -57,7 +64,7 @@ function main()
 	end
 
 	background = Sprite()
-	set_texture(background, manager.textures["darkPurple"])
+	set_texture(background, manager.textures["black"])
 	scale(background, Vector2f(10 * X_SCALE, 10 * Y_SCALE))
 
 	lightshader = manager.shaders["lightshader"]
@@ -90,6 +97,10 @@ function main()
 		for laser in lasers::Array{Laser}
 			update(laser, dt)
 			draw(render_texture, laser)
+		end
+
+		for animation in animations::Array{Animation}
+			draw(render_texture, animation)
 		end
 
 		display(render_texture)
