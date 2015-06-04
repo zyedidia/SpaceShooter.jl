@@ -2,6 +2,7 @@ type ResourceManager
 	sound_effects::Dict{String, SoundBuffer}
 	music::Dict{String, Music}
 	textures::Dict{String, Texture}
+	shaders::Dict{String, Shader}
 	font::Font
 end
 
@@ -11,8 +12,9 @@ function load_files()
 	sounds = load_sound_effects()
 	music = load_music()
 	textures = load_textures()
+	shaders = load_shaders()
 	font = Font(GAME_PATH * "/assets/font/kenvector_future.ttf")
-	manager = ResourceManager(sounds, music, textures, font)
+	manager = ResourceManager(sounds, music, textures, shaders, font)
 end
 
 function load_sound_effects(path = "sound")
@@ -29,6 +31,14 @@ end
 
 function load_music(path = "music")
 	music = Dict{String, Music}()
+
+	files = readdir(GAME_PATH * "/assets/$path")
+	for file in files
+		if ismatch(r".*\.ogg", file)
+			music[filename(file)] = Music(GAME_PATH * "/assets/$path/$file")
+		end
+	end
+	music
 end
 
 function load_textures(path = "img")
@@ -56,3 +66,14 @@ function load_textures(path = "img")
 	textures
 end
 
+function load_shaders(path = "shaders")
+	shaders = Dict{String, Shader}()
+
+	files = readdir(GAME_PATH * "/assets/$path")
+	for file in files
+		if ismatch(r".*\.(vert|frag)", file)
+			shaders[filename(file)] = Shader(GAME_PATH * "/assets/$path/$file")
+		end
+	end
+	shaders
+end

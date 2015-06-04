@@ -43,4 +43,12 @@ end
 
 function draw(window, laser::Laser)
 	draw(window, laser.sprite)
+
+	lightshader = manager.shaders["lightshader"]
+	set_parameter(lightshader, "frag_LightOrigin", get_position(laser.sprite))
+	set_parameter(lightshader, "frag_LightColor", Vector3f(0, 0, 255))
+	set_parameter(lightshader, "frag_LightAttenuation", 10)
+	states = RenderStates(SFML.blend_add, lightshader)
+
+	draw(render_texture, render_texture_sprite, states)
 end

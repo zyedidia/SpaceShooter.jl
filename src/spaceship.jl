@@ -77,6 +77,9 @@ function shoot_laser(ship::SpaceShip)
 		l = Laser("laserBlue01", get_position(ship.sprite))
 		l.angle = ship.angle
 		push!(lasers::Array{Laser}, l)
+
+		sound = Sound(manager.sound_effects["sfx_laser$(rand(1:2))"])
+		play(sound)
 	end
 end
 

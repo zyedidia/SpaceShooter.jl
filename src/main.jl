@@ -28,6 +28,11 @@ const LASER_SPEED = 10
 
 const NUM_ASTEROIDS = 10
 
+# These need to be global so I can access them for drawing shaders in laser.jl
+const render_texture = RenderTexture(SCREEN_WIDTH, SCREEN_HEIGHT)
+const render_texture_sprite = Sprite()
+set_texture(render_texture_sprite, get_texture(render_texture))
+
 function spawn_asteroid()
 	asteroid = Asteroid("meteorBrown_big$(rand(1:4))", Vector2f(rand(0:SCREEN_WIDTH), rand(0:SCREEN_HEIGHT)))
 	push!(game_objects::Array{GameObject}, asteroid)
@@ -55,6 +60,12 @@ function main()
 	set_texture(background, manager.textures["darkPurple"])
 	scale(background, Vector2f(10 * X_SCALE, 10 * Y_SCALE))
 
+	lightshader = manager.shaders["lightshader"]
+	set_parameter(lightshader, "frag_ScreenResolution", Vector2f(SCREEN_WIDTH, SCREEN_HEIGHT))
+
+	set_loop(manager.music["space_music"], true)
+	play(manager.music["space_music"])
+
 	frame_clock = Clock()
 
 	while isopen(window)
@@ -67,19 +78,25 @@ function main()
 			end
 		end
 
-		clear(window, SFML.white)
+		clear(render_texture, SFML.white)
 
-		draw(window, background)
+		draw(render_texture, background)
 
 		for obj in game_objects::Array{GameObject}
 			update(obj, dt)
-			draw(window, obj)
+			draw(render_texture, obj)
 		end
 
 		for laser in lasers::Array{Laser}
 			update(laser, dt)
-			draw(window, laser)
+			draw(render_texture, laser)
 		end
+
+		display(render_texture)
+
+		clear(window, SFML.white)
+
+		draw(window, render_texture_sprite)
 
 		display(window)
 	end
