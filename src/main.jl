@@ -27,10 +27,10 @@ const SHIP_ROTATE_SPEED = 1
 
 const LASER_SPEED = 10
 
-const NUM_ASTEROIDS = 10
+const NUM_ASTEROIDS = 3
 
-function spawn_asteroid()
-	asteroid = Asteroid("meteorBrown_big$(rand(1:4))", Vector2f(rand(0:SCREEN_WIDTH), rand(0:SCREEN_HEIGHT)))
+function spawn_asteroid(pos = Vector2f(rand(0:SCREEN_WIDTH), rand(0:SCREEN_HEIGHT)), scale_factor = 1)
+	asteroid = Asteroid("meteorBrown_big$(rand(1:4))", pos, scale_factor)
 	push!(game_objects::Array{GameObject}, asteroid)
 end
 
@@ -53,9 +53,9 @@ function main()
 	set_texture(render_texture_sprite, get_texture(render_texture))
 
 	player1 = PlayerShip("playerShip1_red", [KeyCode.UP, KeyCode.DOWN, KeyCode.LEFT, KeyCode.RIGHT, KeyCode.SPACE],
-						  start_pos = Vector2f(100 * X_SCALE, 100 * Y_SCALE))
-	player2 = PlayerShip("playerShip1_green", [KeyCode.W, KeyCode.S, KeyCode.A, KeyCode.D, KeyCode.LSHIFT],
 			  			  start_pos = Vector2f(SCREEN_WIDTH - 100 * X_SCALE, SCREEN_HEIGHT - 100 * Y_SCALE))
+	player2 = PlayerShip("playerShip1_blue", [KeyCode.W, KeyCode.S, KeyCode.A, KeyCode.D, KeyCode.LSHIFT],
+						  start_pos = Vector2f(100 * X_SCALE, 100 * Y_SCALE), start_rot = 180)
 
 	global game_objects = GameObject[]
 	global lasers = Laser[]
@@ -86,11 +86,14 @@ function main()
 		while pollevent(window, event)
 			if get_type(event) == EventType.CLOSED
 				close(window)
+			elseif get_type(event) == EventType.KEY_PRESSED
+				if get_key(event).key_code == KeyCode.ESCAPE
+					close(window)
+				end
 			end
 		end
 
 		clear(render_texture, SFML.white)
-
 		draw(render_texture, background)
 
 		for obj in game_objects::Array{GameObject}
@@ -110,9 +113,7 @@ function main()
 		display(render_texture)
 
 		clear(window, SFML.white)
-
 		draw(window, render_texture_sprite)
-
 		display(window)
 	end
 end

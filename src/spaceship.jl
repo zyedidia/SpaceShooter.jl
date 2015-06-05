@@ -8,18 +8,10 @@ type PlayerShip <: SpaceShip
 	cooldown_clock::Clock
 	color::String
 	keys::Array{Int}
+	healthbar::RectangleShape
 end
 
-type EnemyShip <: SpaceShip
-	sprite::Sprite
-	speed::Real
-	angle::Real
-	health::Int
-	cooldown_clock::Clock
-	color::String
-end
-
-function PlayerShip(texture_name, keys; start_pos = Vector2f(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
+function PlayerShip(texture_name, keys; start_pos = Vector2f(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), start_rot = 0)
 	sprite = Sprite()
 	texture = manager.textures[texture_name]
 	set_texture(sprite, texture)
@@ -36,27 +28,10 @@ function PlayerShip(texture_name, keys; start_pos = Vector2f(SCREEN_WIDTH / 2, S
 		color = "Green"
 	end
 
-	PlayerShip(sprite, 0, 0, 10, Clock(), color, keys)
-end
+	healthbar = RectangleShape()
+	set_fillcolor(healthbar, eval(parse("SFML.$(lowercase(color))")))
 
-function EnemyShip(texture_name; start_pos = Vector2f(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
-	sprite = Sprite()
-	texture = manager.textures[texture_name]
-	set_texture(sprite, texture)
-	set_origin(sprite, Vector2f(get_size(texture).x / 2, get_size(texture).y / 2))
-	set_position(sprite, start_pos)
-	scale(sprite, Vector2f(X_SCALE, Y_SCALE))
-
-	color = ""
-	if Base.contains(texture_name, "blue")
-		color = "Blue"
-	elseif Base.contains(texture_name, "red")
-		color = "Red"
-	elseif Base.contains(texture_name, "green")
-		color = "Green"
-	end
-
-	PlayerShip(sprite, 0, 0, 10, Clock(), color)
+	PlayerShip(sprite, 0, start_rot, 10, Clock(), color, keys, healthbar)
 end
 
 function update(ship::SpaceShip, dt)
@@ -87,10 +62,6 @@ function handle_keys(ship::PlayerShip, dt)
 		shoot_laser(ship)
 	end
 
-	ship.speed = clamp(ship.speed, -MAX_SHIP_SPEED, MAX_SHIP_SPEED)
-end
-
-function handle_keys(ship::EnemyShip, dt)
 	ship.speed = clamp(ship.speed, -MAX_SHIP_SPEED, MAX_SHIP_SPEED)
 end
 
@@ -126,6 +97,16 @@ function laser_collision(ship::SpaceShip, laser::Laser)
 	end
 end
 
+function asteroid_collision(ship::SpaceShip, asteroid::Asteroid)
+	ship.health -= 3
+	if ship.health == 0
+		add_explosion(get_position(ship.sprite))
+		die(ship)
+	end
+	add_explosion(get_position(asteroid.sprite))
+	die(asteroid)
+end
+
 function die(ship::SpaceShip)
 	index = find(game_objects::Array{GameObject} .== ship)
 	if length(index) > 0
@@ -134,5 +115,10 @@ function die(ship::SpaceShip)
 end
 
 function draw(window, ship::SpaceShip)
+	size = get_globalbounds(ship.sprite)
+	pos = get_position(ship.sprite)
+	set_size(ship.healthbar, Vector2f(ship.health * 10 * X_SCALE, 10 * Y_SCALE))
+	set_position(ship.healthbar, Vector2f(pos.x - size.width / 2, pos.y - size.height / 2 - 10 * Y_SCALE))
+	draw(window, ship.healthbar)
 	draw(window, ship.sprite)
 end
