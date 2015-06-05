@@ -14,7 +14,7 @@ function Animation(image, pos, delay, num_frames)
 	texture = manager.textures["$image$current_frame"]
 	set_texture(sprite, texture)
 	set_origin(sprite, Vector2f(get_size(texture).x / 2, get_size(texture).y / 2))
-	scale(sprite, Vector2f(2.5 * X_SCALE, 2.5 * Y_SCALE))
+	scale(sprite, Vector2f(3 * X_SCALE, 3 * Y_SCALE))
 
 	clock = Clock()
 	Animation(sprite, current_frame, clock, delay, num_frames, image, pos)

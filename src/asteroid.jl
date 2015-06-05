@@ -30,13 +30,15 @@ end
 
 function laser_collision(asteroid::Asteroid, laser::Laser)
 	add_explosion(get_position(laser.sprite))
-	die(asteroid)
+	# die(asteroid)
 	die(laser)
 end
 
 function die(asteroid::Asteroid)
-	index = find(game_objects::Array{GameObject} .== asteroid)[1]
-	splice!(game_objects::Array{GameObject}, index)
+	index = find(game_objects::Array{GameObject} .== asteroid)
+	if length(index) > 0
+		splice!(game_objects::Array{GameObject}, index[1])
+	end
 end
 
 function draw(window, asteroid::Asteroid)

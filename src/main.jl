@@ -22,7 +22,7 @@ const manager = load_files()
 
 const MAX_SHIP_SPEED = 4
 const SHIP_ACCELERATION = 0.05
-const SHOT_COOLDOWN = 0.25 # In seconds
+const SHOT_COOLDOWN = 1 # In seconds
 const SHIP_ROTATE_SPEED = 1
 
 const LASER_SPEED = 10
@@ -52,12 +52,16 @@ function main()
 	global const render_texture_sprite = Sprite()
 	set_texture(render_texture_sprite, get_texture(render_texture))
 
-	player = PlayerShip("playerShip1_blue")
+	player1 = PlayerShip("playerShip1_red", [KeyCode.UP, KeyCode.DOWN, KeyCode.LEFT, KeyCode.RIGHT, KeyCode.SPACE],
+						  start_pos = Vector2f(100 * X_SCALE, 100 * Y_SCALE))
+	player2 = PlayerShip("playerShip1_green", [KeyCode.W, KeyCode.S, KeyCode.A, KeyCode.D, KeyCode.LSHIFT],
+			  			  start_pos = Vector2f(SCREEN_WIDTH - 100 * X_SCALE, SCREEN_HEIGHT - 100 * Y_SCALE))
 
 	global game_objects = GameObject[]
 	global lasers = Laser[]
 	global animations = Animation[]
-	push!(game_objects, player)
+	push!(game_objects, player1)
+	push!(game_objects, player2)
 
 	for i = 1:NUM_ASTEROIDS
 		spawn_asteroid()

@@ -4,17 +4,22 @@ type PlayerShip <: SpaceShip
 	sprite::Sprite
 	speed::Real
 	angle::Real
+	health::Int
 	cooldown_clock::Clock
+	color::String
+	keys::Array{Int}
 end
 
 type EnemyShip <: SpaceShip
 	sprite::Sprite
 	speed::Real
 	angle::Real
+	health::Int
 	cooldown_clock::Clock
+	color::String
 end
 
-function PlayerShip(texture_name; start_pos = Vector2f(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
+function PlayerShip(texture_name, keys; start_pos = Vector2f(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
 	sprite = Sprite()
 	texture = manager.textures[texture_name]
 	set_texture(sprite, texture)
@@ -22,7 +27,16 @@ function PlayerShip(texture_name; start_pos = Vector2f(SCREEN_WIDTH / 2, SCREEN_
 	set_position(sprite, start_pos)
 	scale(sprite, Vector2f(X_SCALE, Y_SCALE))
 
-	PlayerShip(sprite, 0, 0, Clock())
+	color = ""
+	if Base.contains(texture_name, "blue")
+		color = "Blue"
+	elseif Base.contains(texture_name, "red")
+		color = "Red"
+	elseif Base.contains(texture_name, "green")
+		color = "Green"
+	end
+
+	PlayerShip(sprite, 0, 0, 10, Clock(), color, keys)
 end
 
 function EnemyShip(texture_name; start_pos = Vector2f(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
@@ -33,7 +47,16 @@ function EnemyShip(texture_name; start_pos = Vector2f(SCREEN_WIDTH / 2, SCREEN_H
 	set_position(sprite, start_pos)
 	scale(sprite, Vector2f(X_SCALE, Y_SCALE))
 
-	PlayerShip(sprite, 0, 0, Clock())
+	color = ""
+	if Base.contains(texture_name, "blue")
+		color = "Blue"
+	elseif Base.contains(texture_name, "red")
+		color = "Red"
+	elseif Base.contains(texture_name, "green")
+		color = "Green"
+	end
+
+	PlayerShip(sprite, 0, 0, 10, Clock(), color)
 end
 
 function update(ship::SpaceShip, dt)
@@ -42,9 +65,9 @@ function update(ship::SpaceShip, dt)
 end
 
 function handle_keys(ship::PlayerShip, dt)
-	if is_key_pressed(KeyCode.UP)
+	if is_key_pressed(ship.keys[1])
 		ship.speed += SHIP_ACCELERATION * dt
-	elseif is_key_pressed(KeyCode.DOWN)
+	elseif is_key_pressed(ship.keys[2])
 		ship.speed -= SHIP_ACCELERATION * dt
 	else
 		if ship.speed > 0
@@ -54,13 +77,13 @@ function handle_keys(ship::PlayerShip, dt)
 		end
 	end
 
-	if is_key_pressed(KeyCode.LEFT)
+	if is_key_pressed(ship.keys[3])
 		ship.angle -= SHIP_ROTATE_SPEED * dt
-	elseif is_key_pressed(KeyCode.RIGHT)
+	elseif is_key_pressed(ship.keys[4])
 		ship.angle += SHIP_ROTATE_SPEED * dt
 	end
 
-	if is_key_pressed(KeyCode.SPACE)
+	if is_key_pressed(ship.keys[5])
 		shoot_laser(ship)
 	end
 
@@ -74,7 +97,7 @@ end
 function shoot_laser(ship::SpaceShip)
 	if (get_elapsed_time(ship.cooldown_clock) |> as_seconds) > SHOT_COOLDOWN
 		restart(ship.cooldown_clock)
-		l = Laser("laserBlue01", get_position(ship.sprite))
+		l = Laser("laser$(ship.color)01", get_position(ship.sprite))
 		l.angle = ship.angle
 		push!(lasers::Array{Laser}, l)
 
@@ -92,7 +115,22 @@ function update_pos(ship::SpaceShip, dt)
 end
 
 function laser_collision(ship::SpaceShip, laser::Laser)
-	# Do nothing
+	if ship.color != laser.color
+		ship.health -= 1
+		if ship.health == 0
+			add_explosion(get_position(ship.sprite))
+			die(ship)
+		end
+		add_explosion(get_position(laser.sprite))
+		die(laser)
+	end
+end
+
+function die(ship::SpaceShip)
+	index = find(game_objects::Array{GameObject} .== ship)
+	if length(index) > 0
+		splice!(game_objects::Array{GameObject}, index[1])
+	end
 end
 
 function draw(window, ship::SpaceShip)
