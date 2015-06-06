@@ -39,11 +39,5 @@ function draw(window, animation::Animation)
 
 	draw(window, animation.sprite)
 
-	lightshader = manager.shaders["lightshader"]
-	set_parameter(lightshader, "frag_LightOrigin", animation.position)
-	set_parameter(lightshader, "frag_LightColor", Vector3f(255, 153, 51))
-	set_parameter(lightshader, "frag_LightAttenuation", 200 * ((animation.current_frame + 1) / animation.num_frames))
-	states = RenderStates(SFML.blend_add, lightshader)
-
-	draw(window, render_texture_sprite, states)
+	drawlight(window, animation.position, Color(255, 153, 51, 255), 200 * ((animation.current_frame + 1) / animation.num_frames))
 end

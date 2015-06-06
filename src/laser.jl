@@ -65,11 +65,5 @@ function draw(window, laser::Laser)
 	draw(window, laser.sprite)
 
 	color = laser.color == "Blue" ? SFML.blue : laser.color == "Red" ? SFML.red : SFML.green
-	lightshader = manager.shaders["lightshader"]
-	set_parameter(lightshader, "frag_LightOrigin", get_position(laser.sprite))
-	set_parameter(lightshader, "frag_LightColor", Vector3f(color.r, color.g, color.b))
-	set_parameter(lightshader, "frag_LightAttenuation", 25)
-	states = RenderStates(SFML.blend_add, lightshader)
-
-	draw(window, render_texture_sprite, states)
+	drawlight(window, get_position(laser.sprite), color, 25)
 end

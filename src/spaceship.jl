@@ -83,12 +83,16 @@ function update_pos(ship::SpaceShip, dt)
 	velocity = Vector2f(ship.speed * cosd(ship.angle - 90) * dt * X_SCALE, ship.speed * sind(ship.angle - 90) * dt * Y_SCALE)
 	set_rotation(ship.sprite, ship.angle)
 	move(ship.sprite, velocity)
+
+	size = get_globalbounds(ship.sprite)
+	pos = get_position(ship.sprite)
+	set_position(ship.healthbar, Vector2f(pos.x - size.width / 2, pos.y - size.height / 2 - 10 * Y_SCALE))
 end
 
 function laser_collision(ship::SpaceShip, laser::Laser)
 	if ship.color != laser.color
-		ship.health -= 1
-		if ship.health == 0
+		lose_health(ship, 1)
+		if ship.health <= 0
 			add_explosion(get_position(ship.sprite))
 			die(ship)
 		end
@@ -98,8 +102,8 @@ function laser_collision(ship::SpaceShip, laser::Laser)
 end
 
 function asteroid_collision(ship::SpaceShip, asteroid::Asteroid)
-	ship.health -= 3
-	if ship.health == 0
+	lose_health(ship, 3)
+	if ship.health <= 0
 		add_explosion(get_position(ship.sprite))
 		die(ship)
 	end
@@ -107,18 +111,19 @@ function asteroid_collision(ship::SpaceShip, asteroid::Asteroid)
 	die(asteroid)
 end
 
-function die(ship::SpaceShip)
-	index = find(game_objects::Array{GameObject} .== ship)
+function lose_health(ship::SpaceShip, amount)
+	ship.health -= amount
+	set_size(ship.healthbar, Vector2f(ship.health * 10 * X_SCALE, 10 * Y_SCALE))
+end
+
+function die(obj::GameObject)
+	index = find(game_objects::Array{GameObject} .== obj)
 	if length(index) > 0
 		splice!(game_objects::Array{GameObject}, index[1])
 	end
 end
 
 function draw(window, ship::SpaceShip)
-	size = get_globalbounds(ship.sprite)
-	pos = get_position(ship.sprite)
-	set_size(ship.healthbar, Vector2f(ship.health * 10 * X_SCALE, 10 * Y_SCALE))
-	set_position(ship.healthbar, Vector2f(pos.x - size.width / 2, pos.y - size.height / 2 - 10 * Y_SCALE))
 	draw(window, ship.healthbar)
 	draw(window, ship.sprite)
 end

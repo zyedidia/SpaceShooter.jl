@@ -27,7 +27,7 @@ const SHIP_ROTATE_SPEED = 1
 
 const LASER_SPEED = 10
 
-const NUM_ASTEROIDS = 3
+const NUM_ASTEROIDS = 10
 
 function spawn_asteroid(pos = Vector2f(rand(0:SCREEN_WIDTH), rand(0:SCREEN_HEIGHT)), scale_factor = 1)
 	asteroid = Asteroid("meteorBrown_big$(rand(1:4))", pos, scale_factor)
@@ -37,6 +37,16 @@ end
 function add_explosion(pos)
 	explosion = Animation("expl_01_", pos, 0.05, 23)
 	push!(animations::Array{Animation}, explosion)
+end
+
+function drawlight(window, pos, color, attenuation)
+	lightshader = manager.shaders["lightshader"]
+	set_parameter(lightshader, "frag_LightOrigin", pos)
+	set_parameter(lightshader, "frag_LightColor", Vector3f(color.r, color.g, color.b))
+	set_parameter(lightshader, "frag_LightAttenuation", attenuation)
+	states = RenderStates(SFML.blend_add, lightshader)
+
+	draw(window, render_texture_sprite, states)
 end
 
 function main()
