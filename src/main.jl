@@ -30,6 +30,7 @@ const SHIP_ROTATE_SPEED = 1
 const LASER_SPEED = 10
 
 const NUM_ASTEROIDS = 5
+const ENEMY_SPAWN_TIME = 5 # In seconds
 
 function spawn_asteroid(pos = Vector2f(rand(0:SCREEN_WIDTH), rand(0:SCREEN_HEIGHT)), scale_factor = 1)
 	asteroid = Asteroid("meteorBrown_big$(rand(1:4))", pos, scale_factor)
@@ -37,8 +38,14 @@ function spawn_asteroid(pos = Vector2f(rand(0:SCREEN_WIDTH), rand(0:SCREEN_HEIGH
 end
 
 function add_explosion(pos)
+	play(Sound(manager.sound_effects["explosion2"]))
 	explosion = Animation("expl_01_", pos, 0.05, 23)
 	push!(animations::Array{Animation}, explosion)
+end
+
+function add_enemy()
+	enemy = EnemyShip("ufoRed", start_pos = Vector2f(rand(0:SCREEN_WIDTH), rand(0:SCREEN_HEIGHT)))
+	push!(game_objects::Array{GameObject}, enemy)
 end
 
 function drawlight(window, pos, color, attenuation)
@@ -64,16 +71,17 @@ function main()
 	global const render_texture_sprite = Sprite()
 	set_texture(render_texture_sprite, get_texture(render_texture))
 
-	player1 = PlayerShip("playerShip1_red", [KeyCode.UP, KeyCode.DOWN, KeyCode.LEFT, KeyCode.RIGHT, KeyCode.SPACE],
-			  			  start_pos = Vector2f(SCREEN_WIDTH - 100 * X_SCALE, SCREEN_HEIGHT - 100 * Y_SCALE))
-	player2 = PlayerShip("playerShip1_blue", [KeyCode.W, KeyCode.S, KeyCode.A, KeyCode.D, KeyCode.LSHIFT],
-						  start_pos = Vector2f(100 * X_SCALE, 100 * Y_SCALE), start_rot = 180)
+	player1 = PlayerShip("playerShip1_blue", [KeyCode.UP, KeyCode.DOWN, KeyCode.LEFT, KeyCode.RIGHT, KeyCode.SPACE],
+			  			  start_pos = Vector2f(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
+	# player2 = PlayerShip("playerShip1_red", [KeyCode.W, KeyCode.S, KeyCode.A, KeyCode.D, KeyCode.LSHIFT],
+	# 					  start_pos = Vector2f(100 * X_SCALE, 100 * Y_SCALE), start_rot = 180)
+
 
 	global game_objects = GameObject[]
 	global lasers = Laser[]
 	global animations = Animation[]
 	push!(game_objects, player1)
-	push!(game_objects, player2)
+	# push!(game_objects, player2)
 
 	for i = 1:NUM_ASTEROIDS
 		spawn_asteroid()
@@ -90,6 +98,7 @@ function main()
 	play(manager.music["space_music"])
 
 	frame_clock = Clock()
+	enemyspawn_clock = Clock()
 
 	while isopen(window)
 		dt = (get_elapsed_time(frame_clock) |> as_seconds) * 100
@@ -103,6 +112,11 @@ function main()
 					close(window)
 				end
 			end
+		end
+
+		if (get_elapsed_time(enemyspawn_clock) |> as_seconds) > ENEMY_SPAWN_TIME
+			add_enemy()
+			restart(enemyspawn_clock)
 		end
 
 		clear(render_texture, SFML.white)
