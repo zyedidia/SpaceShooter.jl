@@ -10,7 +10,9 @@ include("asteroid.jl")
 include("spaceship.jl")
 
 const GAME_PATH = dirname(Base.source_path()) * "/.."
-const mode = get_desktop_mode()
+real_width = get_desktop_mode().width
+const mode = VideoMode(real_width, Uint32(round(real_width * 0.5625)))
+# const mode = get_desktop_mode()
 
 const SCREEN_WIDTH = Int(mode.width)
 const SCREEN_HEIGHT = Int(mode.height)
@@ -27,7 +29,7 @@ const SHIP_ROTATE_SPEED = 1
 
 const LASER_SPEED = 10
 
-const NUM_ASTEROIDS = 10
+const NUM_ASTEROIDS = 5
 
 function spawn_asteroid(pos = Vector2f(rand(0:SCREEN_WIDTH), rand(0:SCREEN_HEIGHT)), scale_factor = 1)
 	asteroid = Asteroid("meteorBrown_big$(rand(1:4))", pos, scale_factor)
@@ -52,7 +54,7 @@ end
 function main()
 	settings = ContextSettings()
 	settings.antialiasing_level = 3
-	window = RenderWindow(mode, "Space Shooter", settings, window_fullscreen)
+	window = RenderWindow(mode, "Space Shooter", settings, window_defaultstyle)
 	set_vsync_enabled(window, true)
 	set_framerate_limit(window, 60)
 	event = Event()
