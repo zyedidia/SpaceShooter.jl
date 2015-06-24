@@ -9,6 +9,7 @@ include("animation.jl")
 include("laser.jl")
 include("asteroid.jl")
 include("spaceship.jl")
+include("collision.jl")
 
 function spawn_asteroid(pos = Vector2f(rand(0:SCREEN_WIDTH), rand(0:SCREEN_HEIGHT)), scale_factor = 1)
 	asteroid = Asteroid("meteorBrown_big$(rand(1:4))", pos, scale_factor)
@@ -49,7 +50,10 @@ function main()
 	global const render_texture_sprite = Sprite()
 	set_texture(render_texture_sprite, get_texture(render_texture))
 
+	# These will be initialized for real in init_world()
 	player1 = 0
+	# Second player?
+	# player2 = 0
 	start_pos = 0
 	frame_clock = 0
 	enemyspawn_clock = 0
@@ -61,7 +65,6 @@ function main()
 		# 					  start_pos = Vector2f(100 * X_SCALE, 100 * Y_SCALE), start_rot = 180)
 
 		global game_objects = GameObject[]
-		global lasers = Laser[]
 		global animations = Animation[]
 		push!(game_objects, player1)
 		# push!(game_objects, player2)
@@ -131,13 +134,10 @@ function main()
 				num_asteroids += 1
 			end
 
+			check_collisions(obj)
+
 			update(obj, dt)
 			draw(render_texture, obj)
-		end
-
-		for laser in lasers::Array{Laser}
-			update(laser, dt)
-			draw(render_texture, laser)
 		end
 
 		for animation in animations::Array{Animation}

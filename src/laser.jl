@@ -1,4 +1,4 @@
-type Laser
+type Laser <: GameObject
 	sprite::Sprite
 	speed::Real
 	angle::Real
@@ -28,7 +28,6 @@ end
 
 function update(laser::Laser, dt)
 	update_pos(laser, dt)
-	check_collision(laser)
 end
 
 function update_pos(laser::Laser, dt)
@@ -42,23 +41,6 @@ function update_pos(laser::Laser, dt)
 	velocity = Vector2f(laser.speed * cosd(laser.angle - 90) * dt * X_SCALE, laser.speed * sind(laser.angle - 90) * dt * Y_SCALE)
 	set_rotation(laser.sprite, laser.angle)
 	move(laser.sprite, velocity)
-end
-
-function check_collision(laser::Laser)
-	laser_bounds = get_globalbounds(laser.sprite)
-	for obj in game_objects::Array{GameObject}
-		obj_bounds = get_globalbounds(obj.sprite)
-		if intersects(obj_bounds, laser_bounds)
-			laser_collision(obj, laser)
-		end
-	end
-end
-
-function die(laser::Laser)
-	index = find(lasers::Array{Laser} .== laser)
-	if length(index) > 0
-		splice!(lasers::Array{Laser}, index[1])
-	end
 end
 
 function draw(window, laser::Laser)

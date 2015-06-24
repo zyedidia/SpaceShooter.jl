@@ -45,7 +45,9 @@ function SpaceShip(texture_name, start_pos, start_rot)
 	sprite, 0, start_rot, 10, Clock(), color, healthbar
 end
 
-function PlayerShip(texture_name::String, keys::Array{Int}; start_pos = Vector2f(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), start_rot = 0)
+function PlayerShip(texture_name::String, keys::Array{Int};
+					start_pos = Vector2f(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2),
+					start_rot = 0)
 	r1, r2, r3, r4, r5, r6, r7 = SpaceShip(texture_name, start_pos, start_rot)
 	PlayerShip(r1, r2, r3, r4, r5, r6, r7, keys)
 end
@@ -107,7 +109,7 @@ function shoot_laser(ship::SpaceShip, angle = ship.angle)
 		restart(ship.cooldown_clock)
 		l = Laser("laser$(ship.color)01", get_position(ship.sprite))
 		l.angle = angle
-		push!(lasers::Array{Laser}, l)
+		push!(game_objects::Array{GameObject}, l)
 
 		play(Sound(manager.sound_effects["sfx_laser$(rand(1:2))"]))
 	end
@@ -123,28 +125,6 @@ function update_pos(ship::SpaceShip, dt)
 	size = get_globalbounds(ship.sprite)
 	pos = get_position(ship.sprite)
 	set_position(ship.healthbar, Vector2f(pos.x - size.width / 2, pos.y - size.height / 2 - 10 * Y_SCALE))
-end
-
-function laser_collision(ship::SpaceShip, laser::Laser)
-	if ship.color != laser.color
-		lose_health(ship, 1)
-		if ship.health <= 0
-			add_explosion(get_position(ship.sprite))
-			die(ship)
-		end
-		add_explosion(get_position(laser.sprite))
-		die(laser)
-	end
-end
-
-function asteroid_collision(ship::SpaceShip, asteroid::Asteroid)
-	lose_health(ship, 2)
-	if ship.health <= 0
-		add_explosion(get_position(ship.sprite))
-		die(ship)
-	end
-	add_explosion(get_position(asteroid.sprite))
-	die(asteroid)
 end
 
 function lose_health(ship::SpaceShip, amount)
