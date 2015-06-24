@@ -1,7 +1,4 @@
-type Asteroid <: GameObject
-	sprite::Sprite
-	speed::Real
-	moveangle::Real
+@_type Asteroid GameObject begin
 	rotate_speed::Real
 	time_alive::Clock
 end
@@ -24,7 +21,7 @@ end
 function update_pos(asteroid::Asteroid, dt)
 	wrap_position(asteroid.sprite)
 
-	velocity = Vector2f(asteroid.speed * cosd(asteroid.moveangle - 90) * dt * X_SCALE, asteroid.speed * sind(asteroid.moveangle - 90) * dt * Y_SCALE)
+	velocity = Vector2f(asteroid.speed * cosd(asteroid.angle - 90) * dt * X_SCALE, asteroid.speed * sind(asteroid.angle - 90) * dt * Y_SCALE)
 	rotate(asteroid.sprite, asteroid.rotate_speed * dt)
 	move(asteroid.sprite, velocity)
 end

@@ -1,6 +1,14 @@
 importall SFML
 
-abstract GameObject
+# It is possible to make games without abstract fields,
+# But this feature makes the inheritance much easier
+include("AbstractFields.jl")
+
+@_abstract GameObject begin
+	sprite::Sprite
+	speed::Real
+	angle::Real
+end
 
 include("resourceManager.jl")
 include("constants.jl")
@@ -80,6 +88,7 @@ function main()
 	init_world()
 
 	win_text = RenderText()
+	set_font(win_text, manager.font)
 	set_string(win_text, "You win!")
 	set_charactersize(win_text, 75)
 	bounds = get_globalbounds(win_text)
@@ -91,7 +100,7 @@ function main()
 	set_string(restart_text, "Press enter to restart")
 	move(restart_text, Vector2f(0, bounds.height))
 	bounds = get_globalbounds(restart_text)
-	set_origin(restart_text, Vector2f(bounds.width / 2, bounds.height / 2))
+	set_origin(restart_text, Vector2f(bounds.width / 2, bounds.height / 2 - (40 * Y_SCALE)))
 
 	background = Sprite()
 	set_texture(background, manager.textures["black"])

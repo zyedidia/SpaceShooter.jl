@@ -1,7 +1,4 @@
-type Laser <: GameObject
-	sprite::Sprite
-	speed::Real
-	angle::Real
+@_type Laser GameObject begin
 	color::String
 end
 

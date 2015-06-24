@@ -53,6 +53,7 @@ function check_collisions(obj::GameObject)
 		obj_bounds = get_globalbounds(obj.sprite)
 		for other in game_objects::Array{GameObject}
 			if other == obj continue end
+			# There is no Laser - Asteroid
 			if typeof(obj) == Laser && typeof(other) == Asteroid
 				continue
 			end

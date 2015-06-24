@@ -1,24 +1,15 @@
-abstract SpaceShip <: GameObject
-
-type PlayerShip <: SpaceShip
-	sprite::Sprite
-	speed::Real
-	angle::Real
+@_abstracttype SpaceShip GameObject begin
 	health::Int
 	cooldown_clock::Clock
 	color::String
 	healthbar::RectangleShape
+end
+
+@_type PlayerShip SpaceShip begin
 	keys::Array{Int}
 end
 
-type EnemyShip <: SpaceShip
-	sprite::Sprite
-	speed::Real
-	angle::Real
-	health::Int
-	cooldown_clock::Clock
-	color::String
-	healthbar::RectangleShape
+@_type EnemyShip SpaceShip begin
 	target_pos::Vector2f
 end
 
