@@ -2,35 +2,13 @@ importall SFML
 
 abstract GameObject
 
-include("util.jl")
 include("resourceManager.jl")
+include("constants.jl")
+include("util.jl")
 include("animation.jl")
 include("laser.jl")
 include("asteroid.jl")
 include("spaceship.jl")
-
-const GAME_PATH = dirname(Base.source_path()) * "/.."
-real_width = get_desktop_mode().width
-const mode = VideoMode(real_width, Uint32(round(real_width * 0.5625)))
-# const mode = get_desktop_mode()
-
-const SCREEN_WIDTH = Int(mode.width)
-const SCREEN_HEIGHT = Int(mode.height)
-
-const X_SCALE = SCREEN_WIDTH / 2560
-const Y_SCALE = SCREEN_HEIGHT / 1440
-
-const manager = load_files()
-
-const MAX_SHIP_SPEED = 4
-const SHIP_ACCELERATION = 0.05
-const SHOT_COOLDOWN = 1 # In seconds
-const SHIP_ROTATE_SPEED = 1
-
-const LASER_SPEED = 10
-
-const NUM_ASTEROIDS = 5
-const ENEMY_SPAWN_TIME = 5 # In seconds
 
 function spawn_asteroid(pos = Vector2f(rand(0:SCREEN_WIDTH), rand(0:SCREEN_HEIGHT)), scale_factor = 1)
 	asteroid = Asteroid("meteorBrown_big$(rand(1:4))", pos, scale_factor)
@@ -71,21 +49,46 @@ function main()
 	global const render_texture_sprite = Sprite()
 	set_texture(render_texture_sprite, get_texture(render_texture))
 
-	player1 = PlayerShip("playerShip1_blue", [KeyCode.UP, KeyCode.DOWN, KeyCode.LEFT, KeyCode.RIGHT, KeyCode.SPACE],
-			  			  start_pos = Vector2f(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
-	# player2 = PlayerShip("playerShip1_red", [KeyCode.W, KeyCode.S, KeyCode.A, KeyCode.D, KeyCode.LSHIFT],
-	# 					  start_pos = Vector2f(100 * X_SCALE, 100 * Y_SCALE), start_rot = 180)
+	player1 = 0
+	start_pos = 0
+	frame_clock = 0
+	enemyspawn_clock = 0
 
+	function init_world()
+		player1 = PlayerShip("playerShip1_blue", [KeyCode.UP, KeyCode.DOWN, KeyCode.LEFT, KeyCode.RIGHT, KeyCode.SPACE],
+		start_pos = Vector2f(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
+		# player2 = PlayerShip("playerShip1_red", [KeyCode.W, KeyCode.S, KeyCode.A, KeyCode.D, KeyCode.LSHIFT],
+		# 					  start_pos = Vector2f(100 * X_SCALE, 100 * Y_SCALE), start_rot = 180)
 
-	global game_objects = GameObject[]
-	global lasers = Laser[]
-	global animations = Animation[]
-	push!(game_objects, player1)
-	# push!(game_objects, player2)
+		global game_objects = GameObject[]
+		global lasers = Laser[]
+		global animations = Animation[]
+		push!(game_objects, player1)
+		# push!(game_objects, player2)
 
-	for i = 1:NUM_ASTEROIDS
-		spawn_asteroid()
+		for i = 1:NUM_ASTEROIDS
+			spawn_asteroid()
+		end
+
+		frame_clock = Clock()
+		enemyspawn_clock = Clock()
 	end
+
+	init_world()
+
+	win_text = RenderText()
+	set_string(win_text, "You win!")
+	set_charactersize(win_text, 75)
+	bounds = get_globalbounds(win_text)
+	set_origin(win_text, Vector2f(bounds.width / 2, bounds.height / 2))
+	set_color(win_text, SFML.red)
+	set_position(win_text, Vector2f(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
+
+	restart_text = copy(win_text)
+	set_string(restart_text, "Press enter to restart")
+	move(restart_text, Vector2f(0, bounds.height))
+	bounds = get_globalbounds(restart_text)
+	set_origin(restart_text, Vector2f(bounds.width / 2, bounds.height / 2))
 
 	background = Sprite()
 	set_texture(background, manager.textures["black"])
@@ -96,9 +99,6 @@ function main()
 
 	set_loop(manager.music["space_music"], true)
 	play(manager.music["space_music"])
-
-	frame_clock = Clock()
-	enemyspawn_clock = Clock()
 
 	while isopen(window)
 		dt = (get_elapsed_time(frame_clock) |> as_seconds) * 100
@@ -111,6 +111,9 @@ function main()
 				if get_key(event).key_code == KeyCode.ESCAPE
 					close(window)
 				end
+				if get_key(event).key_code == KeyCode.RETURN
+					init_world()
+				end
 			end
 		end
 
@@ -122,7 +125,12 @@ function main()
 		clear(render_texture, SFML.white)
 		draw(render_texture, background)
 
+		num_asteroids = 0
 		for obj in game_objects::Array{GameObject}
+			if typeof(obj) == Asteroid
+				num_asteroids += 1
+			end
+
 			update(obj, dt)
 			draw(render_texture, obj)
 		end
@@ -134,6 +142,11 @@ function main()
 
 		for animation in animations::Array{Animation}
 			draw(render_texture, animation)
+		end
+
+		if num_asteroids == 0
+			draw(render_texture, win_text)
+			draw(render_texture, restart_text)
 		end
 
 		display(render_texture)
