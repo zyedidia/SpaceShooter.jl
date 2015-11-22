@@ -1,5 +1,5 @@
 @_type Laser GameObject begin
-	color::String
+	color::AbstractString
 end
 
 function Laser(texture_name, pos)

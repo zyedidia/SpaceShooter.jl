@@ -1,8 +1,8 @@
 type ResourceManager
-	sound_effects::Dict{String, SoundBuffer}
-	music::Dict{String, Music}
-	textures::Dict{String, Texture}
-	shaders::Dict{String, Shader}
+	sound_effects::Dict{AbstractString, SoundBuffer}
+	music::Dict{AbstractString, Music}
+	textures::Dict{AbstractString, Texture}
+	shaders::Dict{AbstractString, Shader}
 	font::Font
 end
 
@@ -18,7 +18,7 @@ function load_files()
 end
 
 function load_sound_effects(path = "sound")
-	sounds = Dict{String, SoundBuffer}()
+	sounds = Dict{AbstractString, SoundBuffer}()
 
 	soundfiles = readdir(GAME_PATH * "/assets/$path")
 	for file in soundfiles
@@ -30,7 +30,7 @@ function load_sound_effects(path = "sound")
 end
 
 function load_music(path = "music")
-	music = Dict{String, Music}()
+	music = Dict{AbstractString, Music}()
 
 	files = readdir(GAME_PATH * "/assets/$path")
 	for file in files
@@ -42,7 +42,7 @@ function load_music(path = "music")
 end
 
 function load_textures(path = "img")
-	textures = Dict{String, Texture}()
+	textures = Dict{AbstractString, Texture}()
 
 	files = readdir(GAME_PATH * "/assets/$path")
 	for file in files
@@ -67,7 +67,7 @@ function load_textures(path = "img")
 end
 
 function load_shaders(path = "shaders")
-	shaders = Dict{String, Shader}()
+	shaders = Dict{AbstractString, Shader}()
 
 	files = readdir(GAME_PATH * "/assets/$path")
 	for file in files

@@ -1,7 +1,7 @@
 @_abstracttype SpaceShip GameObject begin
 	health::Int
 	cooldown_clock::Clock
-	color::String
+	color::AbstractString
 	healthbar::RectangleShape
 end
 
@@ -22,7 +22,7 @@ function SpaceShip(texture_name, start_pos, start_rot)
 	scale(sprite, Vector2f(X_SCALE, Y_SCALE))
 
 	color = ""
-	if ismatch(r"(b|B)lue", texture_name)
+	if ismatch(r"(B|b)lue", texture_name)
 		color = "Blue"
 	elseif ismatch(r"(R|r)ed", texture_name)
 		color = "Red"
@@ -36,7 +36,7 @@ function SpaceShip(texture_name, start_pos, start_rot)
 	sprite, 0, start_rot, 10, Clock(), color, healthbar
 end
 
-function PlayerShip(texture_name::String, keys::Array{Int};
+function PlayerShip(texture_name::AbstractString, keys::Array{Int};
 					start_pos = Vector2f(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2),
 					start_rot = 0)
 	r1, r2, r3, r4, r5, r6, r7 = SpaceShip(texture_name, start_pos, start_rot)

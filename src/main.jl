@@ -68,9 +68,9 @@ function main()
 
 	function init_world()
 		player1 = PlayerShip("playerShip1_blue", [KeyCode.UP, KeyCode.DOWN, KeyCode.LEFT, KeyCode.RIGHT, KeyCode.SPACE],
-		start_pos = Vector2f(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
-		# player2 = PlayerShip("playerShip1_red", [KeyCode.W, KeyCode.S, KeyCode.A, KeyCode.D, KeyCode.LSHIFT],
-		# 					  start_pos = Vector2f(100 * X_SCALE, 100 * Y_SCALE), start_rot = 180)
+		          start_pos = Vector2f(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
+		# player2 = PlayerShip("playerShip1_green", [KeyCode.W, KeyCode.S, KeyCode.A, KeyCode.D, KeyCode.LSHIFT],
+				  # start_pos = Vector2f(100 * X_SCALE, 100 * Y_SCALE), start_rot = 180)
 
 		global game_objects = GameObject[]
 		global animations = Animation[]
@@ -94,10 +94,11 @@ function main()
 	bounds = get_globalbounds(win_text)
 	set_origin(win_text, Vector2f(bounds.width / 2, bounds.height / 2))
 	set_color(win_text, SFML.red)
-	set_position(win_text, Vector2f(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
+	set_position(win_text, Vector2f(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - (50 * Y_SCALE)))
 
 	restart_text = copy(win_text)
-	set_string(restart_text, "Press enter to restart")
+	# set_string(restart_text, "Press enter to restart")
+    set_string(restart_text, "")
 	move(restart_text, Vector2f(0, bounds.height))
 	bounds = get_globalbounds(restart_text)
 	set_origin(restart_text, Vector2f(bounds.width / 2, bounds.height / 2 - (40 * Y_SCALE)))

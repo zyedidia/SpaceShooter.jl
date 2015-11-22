@@ -1,6 +1,6 @@
 const GAME_PATH = dirname(Base.source_path()) * "/.."
 real_width = get_desktop_mode().width
-const mode = VideoMode(real_width, Uint32(round(real_width * 0.5625)))
+const mode = VideoMode(real_width, UInt32(round(real_width * 0.5625)))
 # const mode = get_desktop_mode()
 
 const SCREEN_WIDTH = Int(mode.width)

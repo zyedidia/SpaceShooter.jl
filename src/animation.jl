@@ -4,7 +4,7 @@ type Animation
 	clock::Clock
 	delay::Real # In seconds
 	num_frames::Int
-	image_name::String
+	image_name::AbstractString
 	position::Vector2f
 end
 
