@@ -15,3 +15,15 @@ function wrap_position(sprite::Sprite)
 
 	set_position(sprite, pos)
 end
+
+
+function tryeach(f, items)
+    for i in 1:length(items)
+        try
+            item = items[i]
+            f(item)
+        catch
+            break
+        end
+    end
+end

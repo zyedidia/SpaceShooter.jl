@@ -139,7 +139,8 @@ function main()
 		draw(render_texture, background)
 
 		num_asteroids = 0
-		for obj in game_objects::Array{GameObject}
+
+		tryeach(game_objects::Array{GameObject}) do obj
 			if typeof(obj) == Asteroid
 				num_asteroids += 1
 			end
@@ -150,7 +151,7 @@ function main()
 			draw(render_texture, obj)
 		end
 
-		for animation in animations::Array{Animation}
+        tryeach(animations::Array{Animation}) do animation
 			draw(render_texture, animation)
 		end
 
